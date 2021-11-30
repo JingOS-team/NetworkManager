@@ -1,0 +1,25 @@
+Description: platform: add the NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE status check
+ In some cases, the wow is not configured and the NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE is set. So, add the NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE status check.
+Author: Li-Hao Liao (Leon Liao) <leon.liao@canonical.com>
+Origin: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/commit/0107c1add3836d61530cb3878e5cf72b6819b2d3
+Applied-Upstream: 1.26.2
+Last-Update: 2020-08-10
+Bug-Ubuntu: https://bugs.launchpad.net/oem-priority/+bug/1891632
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+Index: network-manager/src/platform/nm-linux-platform.c
+===================================================================
+--- network-manager.orig/src/platform/nm-linux-platform.c
++++ network-manager/src/platform/nm-linux-platform.c
+@@ -8196,7 +8196,10 @@ link_get_wake_on_lan (NMPlatform *platfo
+ 		if (!wifi_data)
+ 			return FALSE;
+ 
+-		return nm_wifi_utils_get_wake_on_wlan (wifi_data) != NM_SETTING_WIRELESS_WAKE_ON_WLAN_NONE;
++		return !NM_IN_SET (nm_wifi_utils_get_wake_on_wlan (wifi_data), 
++		                   NM_SETTING_WIRELESS_WAKE_ON_WLAN_NONE,
++		                   NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE);
++
+ 	} else
+ 		return FALSE;
+ }
